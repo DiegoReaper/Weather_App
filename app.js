@@ -17,7 +17,7 @@ app.set('view engine', 'html');
 
 app.engine('html', ejs.renderFile);
 
-router.get('/view', function (req, res) {
+router.get('/', function (req, res) {
     res.render(path.resolve('index.html'));
 });
 
