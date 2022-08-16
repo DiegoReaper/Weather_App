@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Weather app</title>
+
+    <style>
+        h1 {
+            color: blue;
+        }
+
+        #form-div {
+            text-align: center;
+        }
+
+        #list {
+            padding-left: 300px;
+        }
+
+        #weatherList {
+            padding-left: 200px;
+        }
+
+        body {
+            margin-left: 30%;
+            margin-right: 30%;
+            border-style: solid;
+            border-width: 2px;
+            border-color: blue;
+        }
+
+        #innerPara {
+            text-align: center;
+        }
+
+        #info {
+            text-align: justify;
+            margin: auto;
+            width: 25em;
+            padding: 5px;
+            border-style: solid;
+            border-width: thin;
+            border-color: gray;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="form-div">
+        <form action="" id="form1" onkeydown="return event.key != 'Enter';">
+            <h1>Please enter the cities.</h1>
+            <br>
+            <h3>Press enter after each city to accept the value.</h3>
+            <p id="info">You can enter multiple cities one after the other
+                just by pressing the 'enter' key after entering
+                each city name. When you will be done entering please
+                click on the button and you will get the desired result.
+                Please note, you can keep entering cities even after getting
+                the result, without refreshing the page.
+            </p>
+            <br>
+            <input type="text" id="textInput" class="citiesList">
+        </form>
+        <br>
+        <br>
+        <button type='button' class='btn-submit' id='btnSubmit' onclick='submit()'>
+            Get Temperature
+        </button>
+        <p id="cityPara"></p>
+    </div>
+    <div class="table">
+        <ul id="list">
+
+        </ul>
+
+        <p id="innerPara"></p>
+
+        <ul id="weatherList">
+
+        </ul>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <script>
+
+        var textInput = document.querySelector("#textInput");
+        var ctList = document.querySelector("#list");
+        var para = document.querySelector("#cityPara");
+        var cities = [];
+        var inPar = document.querySelector("#innerPara");
+
+        textInput.addEventListener('keyup', function (event) {
+            if (event.keyCode === 13) {
+                if (this.value.length < 2) {
+                    console.log("Value requitred.");
+                    this.value = "";
+                }
+                else {
+                    var city = this.value.substring(0, this.value.length);
+                    cities.push(city);
+                    this.value = "";
+                    reloadCities();
+                }
+            }
+        })
+
+        function reloadCities() {
+            ctList.innerHTML = "";
+            for (var i = 0; i < cities.length; i++) {
+                para.innerHTML = 'Your entered cities are - ';
+                ctList.innerHTML += `<li> ${cities[i]} </li>`;
+            }
+        }
+
+        function submit() {
+            inPar.innerHTML = `Please wait for a moment as we fetch the data.`;
+            const jsonData = JSON.stringify({ "cities": cities });
+            var apiUrl = 'http://127.0.0.1:3000/getWeather/';
+            var request = new XMLHttpRequest();
+            request.open('POST', apiUrl);
+            request.setRequestHeader("Content-Type", "application/json");
+            request.send(jsonData);
+            request.onload = () => {
+                var weatherList = document.querySelector("#weatherList");
+                var weatherListResponse = JSON.parse(request.response);
+                inPar.innerHTML = '<br>';
+                for (key in weatherListResponse.weather) {
+                    var temp = weatherListResponse.weather[key];
+                    weatherList.innerHTML += `<li> The temperature of ${key} is ${temp} </li>`;
+                }
+                cities = [];
+            }
+
+        }
+
+    </script>
+</body>
+
+</html>
